@@ -50,7 +50,7 @@ Virtualize the table and the log list, so only visible rows render. Add search a
 Status is never color alone, since every badge has text and an icon. Charts have a text summary and a data table. Sortable headers expose `aria-sort`. The selected service uses `aria-pressed`. I chose not to make the log count a live region, because it would announce every 3 seconds.
 
 **How did you test it?**
-Unit tests cover the pure logic: thresholds, determinism, immutability, alert deduplication and log filtering. Component tests use React Testing Library and query by role and accessible name, the way a user or screen reader would find things. That also checks the accessibility labels. CI runs lint, tests and the build on every push before deploying.
+Unit tests cover the pure logic: thresholds, determinism, immutability, alert deduplication and log filtering. Component tests use React Testing Library and query by role and accessible name, the way a user or screen reader would find things. That also checks the accessibility labels. The test setup fails any test that logs a console error, which is how I'd catch something like a misused `mergeClasses()`. CI runs lint, tests and the production build on every push and pull request.
 
 **What would you add next?**
 Time-range selection, a per-alert detail view with related logs, SLO and error-budget tracking, and end-to-end tests with Playwright, including an automated accessibility scan with axe.

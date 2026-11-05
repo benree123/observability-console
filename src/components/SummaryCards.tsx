@@ -1,4 +1,4 @@
-import { Card, Text, makeStyles, tokens } from '@fluentui/react-components';
+import { Card, Text, makeStyles, mergeClasses, tokens } from '@fluentui/react-components';
 import { latest, serviceHealth } from '../telemetry/health';
 import { formatCompact } from '../telemetry/format';
 import type { TelemetryState } from '../telemetry/types';
@@ -41,7 +41,7 @@ export function SummaryCards({ state }: { state: TelemetryState }) {
       {items.map((item) => (
         <Card key={item.label} className={styles.card}>
           <Text className={styles.label}>{item.label}</Text>
-          <Text className={`${styles.value} ${item.bad ? styles.bad : ''}`}>{item.value}</Text>
+          <Text className={mergeClasses(styles.value, item.bad && styles.bad)}>{item.value}</Text>
         </Card>
       ))}
     </section>

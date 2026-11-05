@@ -1,9 +1,9 @@
-name: CI and deploy
+# Optional: publishes the demo to GitHub Pages.
+# Turn on Pages first (Settings > Pages > Source: GitHub Actions), then run this
+# workflow from the Actions tab. It only runs when started by hand.
+name: Deploy demo to GitHub Pages
 
 on:
-  push:
-    branches: [main]
-  pull_request:
   workflow_dispatch:
 
 permissions:
@@ -25,16 +25,13 @@ jobs:
           node-version: 24
           cache: npm
       - run: npm ci
-      - run: npm run lint
       - run: npm test
       - run: npm run build
       - uses: actions/upload-pages-artifact@v3
-        if: github.event_name != 'pull_request'
         with:
           path: dist
 
   deploy:
-    if: github.event_name != 'pull_request'
     needs: build
     runs-on: ubuntu-latest
     environment:

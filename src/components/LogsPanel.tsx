@@ -18,7 +18,12 @@ const LEVELS: LogLevel[] = ['error', 'warning', 'info'];
 const LEVEL_LABEL: Record<LogLevel, string> = { error: 'Error', warning: 'Warning', info: 'Info' };
 
 const useStyles = makeStyles({
-  card: { padding: tokens.spacingVerticalM, gap: tokens.spacingVerticalS },
+  card: {
+    padding: tokens.spacingVerticalM,
+    gap: tokens.spacingVerticalS,
+    // In the two-column layout, fill the rest of the column so it lines up with the left side.
+    '@media (min-width: 1101px)': { flexGrow: 1, minHeight: 0 },
+  },
   controls: { display: 'flex', flexWrap: 'wrap', gap: tokens.spacingHorizontalS, alignItems: 'center' },
   search: { flexGrow: 1, minWidth: '180px' },
   list: {
@@ -27,6 +32,7 @@ const useStyles = makeStyles({
     padding: 0,
     maxHeight: '360px',
     overflowY: 'auto',
+    '@media (min-width: 1101px)': { flexGrow: 1, flexBasis: 0, minHeight: '240px', maxHeight: 'none' },
     fontFamily: tokens.fontFamilyMonospace,
     fontSize: tokens.fontSizeBase200,
   },

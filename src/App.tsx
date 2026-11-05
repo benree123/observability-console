@@ -117,7 +117,11 @@ export default function App() {
   const [dark, setDark] = useState(prefersDark);
 
   return (
-    <FluentProvider theme={dark ? webDarkTheme : webLightTheme} className={styles.root}>
+    <FluentProvider
+      theme={dark ? webDarkTheme : webLightTheme}
+      className={styles.root}
+      data-theme={dark ? 'dark' : 'light'}
+    >
       <header className={styles.header}>
         <div>
           <Title2 as="h1">Observability Console</Title2>

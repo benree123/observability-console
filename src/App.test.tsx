@@ -2,7 +2,7 @@ import { FluentProvider, webLightTheme } from '@fluentui/react-components';
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it } from 'vitest';
-import { Dashboard } from './App';
+import App, { Dashboard } from './App';
 
 const NOW = Date.UTC(2026, 10, 5, 17, 30);
 
@@ -88,6 +88,35 @@ describe('Dashboard', () => {
     }
   });
 
+  it.each([
+    ['error', 'ERROR', ['Warning', 'Info']],
+    ['warning', 'WARNING', ['Error', 'Info']],
+    ['info', 'INFO', ['Error', 'Warning']],
+  ])('shows only %s logs when that is the only level selected', async (_, label, turnOff) => {
+    const user = userEvent.setup();
+    renderDashboard();
+    for (const name of turnOff) {
+      const button = screen.getByRole('button', { name });
+      await user.click(button);
+      expect(button).toHaveAttribute('aria-pressed', 'false');
+    }
+    const items = within(screen.getByRole('list', { name: 'Logs' })).getAllByRole('listitem');
+    expect(items.length).toBeGreaterThan(0);
+    for (const item of items) {
+      expect(item.children[1]).toHaveTextContent(new RegExp(`^${label}$`));
+    }
+  });
+
+  it('shows no logs when every level is turned off', async () => {
+    const user = userEvent.setup();
+    renderDashboard();
+    for (const name of ['Error', 'Warning', 'Info']) {
+      await user.click(screen.getByRole('button', { name }));
+    }
+    expect(within(screen.getByRole('list', { name: 'Logs' })).queryAllByRole('listitem')).toHaveLength(0);
+    expect(screen.getByText(/Showing 0 of 0/)).toBeInTheDocument();
+  });
+
   it('advances simulated time one minute at a time while paused', async () => {
     const user = userEvent.setup();
     renderDashboard();
@@ -95,5 +124,36 @@ describe('Dashboard', () => {
     const before = clock.textContent;
     await user.click(screen.getByRole('button', { name: 'Step 1 minute' }));
     expect(clock.textContent).not.toBe(before);
+  });
+});
+
+describe('App theme', () => {
+  it('starts light when the system prefers light, and toggles dark and back', async () => {
+    const user = userEvent.setup();
+    const { container } = render(<App />);
+    const provider = container.querySelector('.fui-FluentProvider')!;
+    const toggle = screen.getByRole('switch', { name: 'Dark theme' });
+
+    expect(provider).toHaveAttribute('data-theme', 'light');
+    expect(toggle).not.toBeChecked();
+
+    await user.click(toggle);
+    expect(provider).toHaveAttribute('data-theme', 'dark');
+    expect(toggle).toBeChecked();
+
+    await user.click(toggle);
+    expect(provider).toHaveAttribute('data-theme', 'light');
+  });
+
+  it('starts dark when the system prefers dark', () => {
+    const original = window.matchMedia;
+    window.matchMedia = ((query: string) => ({ ...original(query), matches: query.includes('dark') })) as typeof window.matchMedia;
+    try {
+      const { container } = render(<App />);
+      expect(container.querySelector('.fui-FluentProvider')).toHaveAttribute('data-theme', 'dark');
+      expect(screen.getByRole('switch', { name: 'Dark theme' })).toBeChecked();
+    } finally {
+      window.matchMedia = original;
+    }
   });
 });
